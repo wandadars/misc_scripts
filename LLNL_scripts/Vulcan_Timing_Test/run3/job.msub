@@ -1,0 +1,31 @@
+#!/bin/sh
+##### These lines are for Moab
+#MSUB -N SafeRestartTest_Run3
+#MSUB -l nodes=60
+#MSUB -l partition=cab
+#MSUB -l walltime=12:00:00
+#MSUB -q pbatch
+#MSUB -m abe
+#MSUB -A florida
+#MSUB -V
+#MSUB -j oe
+#MSUB -o job.log
+
+##### These are shell commands
+arch=`uname -p`
+echo Architecture = $arch
+
+#Initialize DOTKIT environment for loading modules
+. /usr/local/tools/dotkit/init.sh
+
+module load gnu/4.9.1 openmpi-gnu/1.6
+
+use gcc-4.9.0p openmpi-gnu-1.6.5
+
+EXEC=/g/g17/neal12/codes/timingTest/TimingTest.exe
+
+echo "Executable        =" $EXEC
+echo "Current Directory =" `pwd`
+
+echo Using `which mpirun`
+srun -N 60 -n 960 $EXEC
