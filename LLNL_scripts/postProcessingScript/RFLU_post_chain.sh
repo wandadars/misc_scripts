@@ -8,14 +8,14 @@
 # Author: Christopher Neal
 #
 # Date: 03-27-2015
-# Updated: 08-20-2015
+# Updated: 07-07-2016
 #
 #######################################################################################
 
 # This script should be executed in the directory that contains the template job 
 # submission script.
 #
-# It takes the following 2 arguments:
+# It takes the following 3 arguments:
 # 1.) The solution stride that you want to post-process
 # 2.) The integer value of the solution that you want to start processing from
 #	i.e. if argument 1 is 1 and argument 2 is 6 then the script will process
@@ -23,6 +23,13 @@
 #	useful for processing additional solutions without re-processing every solution 
 #	file in the working directory.
 #
+# 3.) The maximum number of files to analyze up to in terms of the integer index of the
+#       files. The script will submit jobs for timesteps up to and including the one
+#       specified by the 3rd argument. If the 3rd argument is left EMPTY, then all 
+#       solutions will be processed.
+#
+#
+
 echo 'Running Rocflu Post-Processing Chain Submission Script'
 
 
@@ -32,10 +39,8 @@ echo "Extracting List of Solution Times From .mixt Solution Files"
 #Put all files in current directory into a text file
 ls *mixt.cva*00001* >temp.txt
 
-
 #Trim filename up the first underscore.
 sed -n -i "s/[^_]*_//p" temp.txt
-
 
 #Trim filename up to the second underscore.
 sed -n -i "s/[^_]*_//p" temp.txt
@@ -43,7 +48,6 @@ sed -n -i "s/[^_]*_//p" temp.txt
 
 #At this point we have all of the times, but they are not sorted.
 #Sort the times that are in Extracted_Data_Labels.txt
-
 sort -k1g temp.txt > Extracted_Data_Labels.txt
 
 #Remove temporary files
@@ -56,12 +60,19 @@ rm -rf temp.txt
 # from being permanently changed.
 cp -rf  job_RFLU_postchain.msub tempScript.msub
 
+if [ "$#" -lt 3 ]; then
+	MaxJobNum=1000000
+else
+	MaxJobNum=$3
+fi
+
 #Loop over times in the file Extracted_Data_Labels.txt and submit jobs
 c=1
 while read line1
 do
 
-if [ $(($c%$1)) == 0 ]; then #Check to see if the file is a multiple of the stride # input
+
+if [ $(($c%$1)) == 0 -a $c -le $MaxJobNum ]; then #Check to see if the file is a multiple of the stride # input
 
    if [ -z "$2" ]; then #If argument returns true is the second input argument is empty
 
@@ -71,11 +82,9 @@ if [ $(($c%$1)) == 0 ]; then #Check to see if the file is a multiple of the stri
       ReplaceString="#MSUB -o job_RFLU_postchain$c.log"
       sed -i "s/#MSUB -o.*/$ReplaceString/" job_RFLU_postchain.msub
 
-
       # The variable $line1 contains the timestamp that we want to run rflupost for
       # Replace the TimeStamp entry in the job submission template with the actual time
       # and submit job
-
       ReplaceString="$line1"  
 
       sed -i "s/TimeStamp.*/$ReplaceString/" job_RFLU_postchain.msub
