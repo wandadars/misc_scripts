@@ -1,30 +1,17 @@
 #!/bin/bash
 
-################################################################################
-#
 # Purpose: Add zero to rflupost output files in the exponential part of the file
 #          name.
-#
 #
 # Description: Adds an additional zero to the exponential part of the rflupost
 #              output in order for output to be readable by Tecplot macros.
 #              Example: cylds_3.00035E-02.plt ---> cylds_3.00035E-002.plt
 #
-#
-# 
-#
-#
 # Author: Christopher Neal
 # Date:	  6/14/2014
-#
-################################################################################
+# Updated: 07/14/2016
 
-echo "NOTICE: A different version of rflupost was used for this script"
-echo "Change rflupost call to the name of the executable that you use"
-sleep 5s
-
-#-------------------------RFLUPOST SECTION---------------------------------------
-echo "Running RFLUpost on Solution Files"
+echo "Converting solution files to Windows compatible format"
 
 #Put all files in current directory into a text file
 for f in *; do echo "$f"; done >temp.txt
@@ -51,23 +38,6 @@ sort -k1g temp2.txt > Extracted_Data_Labels.txt
 
 #Remove temporary files
 rm -rf temp2.txt
-
-#Run rflupost on the file times that are in the file Extracted_Data_Labels.txt
-c=1
-while read line1
-do
-
-   echo "Running rflupost on file $c ."
-   c=$(($c+1))
-
-   rflupost -c cylds -v 0 -s $line1 ##ADJUST TO WHATEVER RFLUPOST NAME YOU USE###
-
-done < Extracted_Data_Labels.txt
-
-
-#---------------------------------------------------------------------------------
-
-
 
 
 #-------------------TECPLOT FILENAME ADJUSTMENT SECTION--------------------------
