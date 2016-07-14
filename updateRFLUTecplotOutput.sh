@@ -16,47 +16,35 @@ echo "Converting solution files to Windows compatible format"
 #Put all files in current directory into a text file
 for f in *; do echo "$f"; done >temp.txt
 
-#Print the occurences of the first processor solution files to a new file
-sed -n "/.mixt.cva_00001_/p" temp.txt >temp2.txt
 
+#Print the occurences of the first processor solution files to a new file
+sed -n "/.plt/p" temp.txt >temp2.txt
+
+# remove the duplicate *.pat.plt files that are unnecessary
+sed -n "/.pat./d" temp2.txt >temp3.txt
 
 #Trim filename up the first underscore.
-sed -n -i "s/[^_]*_//p" temp2.txt
+sed -n -i "s/[^_]*_//p" temp3.txt
 
 
 #Trim filename up to the second underscore.
-sed -n -i "s/[^_]*_//p" temp2.txt
+sed -n -i "s/[^_]*_//p" temp3.txt
 
 
 #Remove temporary files
-rm -rf temp.txt
+rm -rf temp.txt temp2.txt
 
 #At this point we have all of the times, but they are not sorted.
 #Sort the times that are in Extracted_Data_Labels.txt
 
-sort -k1g temp2.txt > Extracted_Data_Labels.txt
+sort -k1g temp3.txt > Extracted_Data_Labels.txt
 
 #Remove temporary files
-rm -rf temp2.txt
+rm -rf temp3.txt
 
 
 #-------------------TECPLOT FILENAME ADJUSTMENT SECTION--------------------------
 echo "Adjusting all Tecplot files to have extra exponential digit"
-
-# First take all the instances of the tecplot .plt files and store them into a
-# temporary file. cylds_0.00000E+00.plt  <--Sample file name
-
-#----------------------REMOVED--------------------------------
-#ls | grep "plt" | grep -v "pat" > temp1.txt
-
-
-#Trim the front off the file name to leave the number with the file extension.
-#sed -n -i "s/[^_]*_//p" temp1.txt
-
-# Trim the back off of the file name to leave only the number.
-#sed -i " s/.[^.]*$//" temp1.txt
-
-#------------------------------------------------------------
 
 #Store old values of time stamps in a temporary file
 cp Extracted_Data_Labels.txt temp1.txt
@@ -68,8 +56,6 @@ sed -i "s/^\(.\{10\}\)/\10/" Extracted_Data_Labels.txt
 
 
 #Copy old .plt files to new .plt files with updates names.
-
-
 exec 3<temp1.txt
 exec 4<Extracted_Data_Labels.txt
 
