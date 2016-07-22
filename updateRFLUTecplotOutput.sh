@@ -17,30 +17,35 @@ echo "Converting solution files to Windows compatible format"
 for f in *; do echo "$f"; done >temp.txt
 
 
-#Print the occurences of the first processor solution files to a new file
-sed -n "/.plt/p" temp.txt >temp2.txt
+#Print the occurences of the *.plt solution files to a new file. This may include some repeated *.pat.plt files.
+sed -n "/\.plt/p" temp.txt >temp2.txt
 
 # remove the duplicate *.pat.plt files that are unnecessary
-sed -n "/.pat./d" temp2.txt >temp3.txt
+sed -i "/\.pat/d" temp2.txt 
 
 #Trim filename up the first underscore.
-sed -n -i "s/[^_]*_//p" temp3.txt
+sed -n -i "s/[^_]*_//p" temp2.txt
 
+#Flip Lines
+sed -i '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//' temp2.txt
 
-#Trim filename up to the second underscore.
-sed -n -i "s/[^_]*_//p" temp3.txt
+#Trim filenames up to the first period.
+sed  -i 's/^[^.]*.//' temp2.txt
+
+#Reverse lines back to orginal orientation
+sed  -i '/\n/!G;s/\(.\)\(.*\n\)/&\2\1/;//D;s/.//' temp2.txt
 
 
 #Remove temporary files
-rm -rf temp.txt temp2.txt
+rm -rf temp.txt 
 
 #At this point we have all of the times, but they are not sorted.
 #Sort the times that are in Extracted_Data_Labels.txt
 
-sort -k1g temp3.txt > Extracted_Data_Labels.txt
+sort -k1g temp2.txt > Extracted_Data_Labels.txt
 
 #Remove temporary files
-rm -rf temp3.txt
+rm -rf temp2.txt
 
 
 #-------------------TECPLOT FILENAME ADJUSTMENT SECTION--------------------------
