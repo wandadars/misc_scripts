@@ -8,7 +8,7 @@
 # Author: Christoher Neal
 # Date:   09/15/2016
 #####################################################################
-#for use of reading and writing files
+
 import os
 import glob
 import xml.etree.ElementTree as ET
@@ -78,8 +78,11 @@ elif(FolderFlag == 1):
 	time_stamps = [name.split("_")[-1] for name in output_directories ]
 	
 
-print "\nExtracted timestamps from directory names are:\n" , time_stamps
 
+#Sort the time stamps from lowest to largest and remove any repeats
+time_stamps = list(set(time_stamps))  #To remove any repeats that may exist
+time_stamps = sorted(time_stamps, key=float) # sort by numerical order from small to large
+print "\nExtracted timestamps from directory names are:\n" , time_stamps
 
 
 
