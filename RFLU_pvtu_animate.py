@@ -27,7 +27,7 @@ if len(sys.argv) < 3:
 	print "\t1 - For cases that have particles"
 	sys.exit()
 else:
-	print 'Argument Detected: ', str(sys.argv)
+	print 'Arguments Detected: ', str(sys.argv[1:])
 
 if sys.argv[1] == '0':
 	FolderFlag = 0
@@ -81,7 +81,7 @@ elif(FolderFlag == 1):
 	output_directories = [name for name in all_directories if "PARAVIEW" in name]
 
 	if len(output_directories) > 0:
-		print "Detected output directories are:\n" 
+		print "\nDetected output directories are:" 
 		for DirName in output_directories:
 			print DirName			
 	else:
@@ -120,7 +120,7 @@ for line in searchfile:
 
 if(region_count < 2):
 	print "\nOnly 1 region found in dataset. Fixing ROCFLU naming convention in the .pvtu files for cases with single regions"
-	print "Example in .pvtu files:  <Piece Source=\"xdsp_4.50165E-06_00001.vtu\" />  --changed to->  <Piece Source=\"xdsp_4.50165E-06_00000.vtu\" /> "
+	print "Example in .pvtu files:  <Piece Source=\"xdsp_4.50165E-06_00001.vtu\" />  --changed to->  <Piece Source=\"xdsp_4.50165E-06_00000.vtu\" /> \n"
 	#Update all .pvtu files to have correct naming convention
 	for time in time_stamps:
 	        if(FolderFlag == 0):
@@ -173,7 +173,10 @@ if(region_count < 2):
 		
 
 ###BUILD PVD FILE###
-print "Constructing ParaView *.pvd file"
+if(ParticlesFlag == 0):
+	print "Constructing ParaView *.pvd file containing flowfield information"
+else:
+	print "Constructing ParaView *.pvd file containing flowfield and particle information"
 #Construct the header of the *.pvd XML formatted ascii file
 root = ET.Element('VTKFile')
 Collection = ET.SubElement(root,"Collection")
@@ -221,7 +224,7 @@ new_root = ET.fromstring(pretty_xml_as_string)
 document = ET.ElementTree(new_root)
 document.write('paraview.pvd', encoding='utf-8', xml_declaration=True)
 
-
+print "Code Finished"
 
 
 
